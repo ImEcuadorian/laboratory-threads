@@ -29,14 +29,12 @@ public class Laboratory {
                 samples.add(sample);
                 sampleFile.writeFile(sample.toCSV(), false);
 
-                // Guardar archivo individual por paciente
 
                 Files individualFile = new Files("resultados/" + sample.getId() + ".txt");
                 individualFile.createFile(FileType.FILE);
                 individualFile.writeFile(sample.toCSV(), false);
             }
 
-            // Crear lista de técnicos y escribir tecnicos.txt
             Files techFile = new Files(TECHNICIANS_FILE);
             techFile.createFile(FileType.FILE);
             for (int i = 1; i <= TECHNICIANS; i++) {
@@ -45,7 +43,6 @@ public class Laboratory {
                 techFile.writeFile(techName, false);
             }
 
-            // Leer técnicos desde archivo y asignar muestras
             for (int i = 0; i < TECHNICIANS; i++) {
                 String techName = technicianNames.get(i);
                 List<Sample> assigned = samples.subList(i * 5, (i + 1) * 5);

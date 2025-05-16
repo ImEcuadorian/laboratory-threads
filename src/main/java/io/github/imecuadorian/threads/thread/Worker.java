@@ -66,10 +66,8 @@ public class Worker implements Runnable {
 
                 result.append(String.format("[%s] Resultado de muestra %s: %s\n\n", name, s.getId(), ok ? "Aprobada" : "Fuera de rango"));
 
-                // Guardar en archivo
                 resultFile.writeFile(result.toString(), true);
 
-                // Imprimir en consola también
                 System.out.print(result);
 
                 if (!ok) outOfRange++;
