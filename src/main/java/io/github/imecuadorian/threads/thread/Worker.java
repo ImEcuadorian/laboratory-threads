@@ -1,7 +1,9 @@
 package io.github.imecuadorian.threads.thread;
 
+import io.github.imecuadorian.library.*;
 import io.github.imecuadorian.threads.model.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -18,52 +20,65 @@ public class Worker implements Runnable {
     public void run() {
         int outOfRange = 0;
         try {
+            Files resultFile = new Files("resultados/" + name + "_resultados.txt");
+            resultFile.createFile(FileType.FILE);
+
             for (Sample s : samples) {
                 Thread.sleep(ThreadLocalRandom.current().nextInt(500, 2000));
                 boolean ok = true;
-                System.out.printf("[%s] Analizando muestra %s:\n", name, s.getId());
+                StringBuilder result = new StringBuilder();
+                result.append(String.format("[%s] Analizando muestra %s:\n", name, s.getId()));
 
                 if (s.getGlucose() < 70 || s.getGlucose() > 110) {
-                    System.out.printf(" - Glucosa fuera de rango: %d\n", s.getGlucose());
+                    result.append(String.format(" - Glucosa fuera de rango: %d\n", s.getGlucose()));
                     ok = false;
                 } else {
-                    System.out.printf(" - Glucosa OK: %d\n", s.getGlucose());
+                    result.append(String.format(" - Glucosa OK: %d\n", s.getGlucose()));
                 }
 
                 if (s.getCholesterol() > 200) {
-                    System.out.printf(" - Colesterol fuera de rango: %d\n", s.getCholesterol());
+                    result.append(String.format(" - Colesterol fuera de rango: %d\n", s.getCholesterol()));
                     ok = false;
                 } else {
-                    System.out.printf(" - Colesterol OK: %d\n", s.getCholesterol());
+                    result.append(String.format(" - Colesterol OK: %d\n", s.getCholesterol()));
                 }
 
                 if (s.getTriglycerides() > 150) {
-                    System.out.printf(" - Triglicéridos fuera de rango: %d\n", s.getTriglycerides());
+                    result.append(String.format(" - Triglicéridos fuera de rango: %d\n", s.getTriglycerides()));
                     ok = false;
                 } else {
-                    System.out.printf(" - Triglicéridos OK: %d\n", s.getTriglycerides());
+                    result.append(String.format(" - Triglicéridos OK: %d\n", s.getTriglycerides()));
                 }
 
                 if (s.getHemoglobin() < 12 || s.getHemoglobin() > 18) {
-                    System.out.printf(" - Hemoglobina fuera de rango: %.1f\n", s.getHemoglobin());
+                    result.append(String.format(" - Hemoglobina fuera de rango: %.1f\n", s.getHemoglobin()));
                     ok = false;
                 } else {
-                    System.out.printf(" - Hemoglobina OK: %.1f\n", s.getHemoglobin());
+                    result.append(String.format(" - Hemoglobina OK: %.1f\n", s.getHemoglobin()));
                 }
 
                 if (s.getUrea() < 10 || s.getUrea() > 50) {
-                    System.out.printf(" - Urea fuera de rango: %d\n", s.getUrea());
+                    result.append(String.format(" - Urea fuera de rango: %d\n", s.getUrea()));
                     ok = false;
                 } else {
-                    System.out.printf(" - Urea OK: %d\n", s.getUrea());
+                    result.append(String.format(" - Urea OK: %d\n", s.getUrea()));
                 }
 
-                System.out.printf("[%s] Resultado de muestra %s: %s\n\n", name, s.getId(), ok ? "Aprobada" : "Fuera de rango");
+                result.append(String.format("[%s] Resultado de muestra %s: %s\n\n", name, s.getId(), ok ? "Aprobada" : "Fuera de rango"));
+
+                // Guardar en archivo
+                resultFile.writeFile(result.toString(), true);
+
+                // Imprimir en consola también
+                System.out.print(result);
+
                 if (!ok) outOfRange++;
             }
             double percent = (outOfRange * 100.0) / samples.size();
-            System.out.printf("[%s] Porcentaje de muestras fuera de rango: %.2f%%\n", name, percent);
-        } catch (InterruptedException e) {
+            String summary = String.format("[%s] Porcentaje de muestras fuera de rango: %.2f%%\n", name, percent);
+            resultFile.writeFile(summary, true);
+            System.out.print(summary);
+        } catch (InterruptedException | IOException e) {
             Thread.currentThread().interrupt();
         }
     }
